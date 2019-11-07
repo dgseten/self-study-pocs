@@ -1,0 +1,19 @@
+FROM ubuntu:18.04
+LABEL maintainer="dgseten"
+
+# Install required software
+RUN apt-get update && apt-get install -y \
+    wget \
+    git \
+    default-jdk \
+  && rm -rf /var/lib/apt/lists/*
+
+# Install mvn
+WORKDIR /usr/local/src
+RUN wget http://apache.uvigo.es/maven/maven-3/3.6.2/binaries/apache-maven-3.6.2-bin.tar.gz && tar -xvf apache-maven-3.6.2-bin.tar.gz && mv apache-maven-3.6.2 /usr/local/bin/ && ln -s /usr/local/bin/apache-maven-3.6.2/bin/mvn /usr/local/bin/mvn && rm apache-maven-3.6.2-bin.tar.gz
+
+# Install dependencies
+RUN wget http://packages.confluent.io/maven/io/confluent/kafka-avro-serializer/1.0/kafka-avro-serializer-1.0.jar && mvn install:install-file -DgroupId=io.confluent -DartifactId=kafka-avro-serializer -Dversion=1.0 -Dpackaging=jar -Dfile=/usr/local/src/kafka-avro-serializer-1.0.jar 
+
+# git clone
+RUN git clone https://github.com/apache/storm
